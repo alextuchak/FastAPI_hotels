@@ -1,5 +1,6 @@
 from motor import motor_asyncio
 from bson import ObjectId
+from pydantic import BaseModel, Field, field_validator
 from typing import Annotated, Any, Callable
 from pydantic_core import core_schema
 
@@ -28,13 +29,37 @@ class PyObjectId(ObjectId):
         )
 
 
+class PyPoint(BaseModel):
+    type: str = Field(default="Point")
+    coordinates: list = Field(...)
+
+    @field_validator("type")
+    def type_validate(cls, value):
+        if value != "Point":
+            raise ValueError("type must be Point")
+        return value
+
+    @field_validator("coordinates")
+    def coords_validate(cls, value):
+        if type(value) != list:
+            raise ValueError("coordinates must be list")
+        if not -180.0 < value[0] < 180.0:
+            raise ValueError("coordinates must be list of longitude and latitude in range -180 - +180 and -90 - "
+                             "+90 degrees")
+        if not -90.0 < value[0] < 90.0:
+            raise ValueError("coordinates must be list of longitude and latitude in range -180 - +180 and -90 - "
+                             "+90 degrees")
+        return value
+
+
 PydanticObjectId = Annotated[
     ObjectId, PyObjectId
 ]
 
-# async def session():
-#     s = await client.start_session()
-#     return s
+
+async def session():
+    s = await client.start_session()
+    return s
 
 # @app.on_event("startup")
 # async def startup_event():
