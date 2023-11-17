@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 from .database import db
 from app.hotels.router import router as hotels_routers
+from app.settings import settings
 
 app = FastAPI()
 

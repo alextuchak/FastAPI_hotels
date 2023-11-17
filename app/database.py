@@ -3,8 +3,10 @@ from bson import ObjectId
 from pydantic import BaseModel, Field, field_validator
 from typing import Annotated, Any, Callable
 from pydantic_core import core_schema
+from app.settings import settings
 
-client = motor_asyncio.AsyncIOMotorClient('mongodb://root:example@localhost:27017')
+
+client = motor_asyncio.AsyncIOMotorClient(settings.MONGO_URL)
 db = client['hotels']
 
 
