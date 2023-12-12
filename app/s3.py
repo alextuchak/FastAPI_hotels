@@ -1,6 +1,6 @@
 from miniopy_async import Minio
 from app.settings import settings
-
+import sys
 
 class S3:
     client = Minio(endpoint=settings.MINIO_ENDPOINT, access_key=settings.ACCESS_KEY, secret_key=settings.SECRET_KEY,
@@ -8,6 +8,7 @@ class S3:
 
     @classmethod
     async def upload(cls, file_name, file):
+        file.seek(0)
         await cls.client.put_object(settings.MINIO_BUCKET, file_name, file, part_size=10 * 1024 * 1024,
                                     length=-1)
         url = await cls.download(file_name)

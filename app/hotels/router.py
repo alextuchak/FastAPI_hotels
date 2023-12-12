@@ -84,7 +84,7 @@ async def create_service_type(service: ServiceTypesArgs = Depends(), file: Uploa
 
 
 @router.get(
-    'service_types/get_service_type/{service_type_id}',
+    '/service_types/get_service_type/{service_type_id}',
     response_model=ServiceTypes,
     status_code=status.HTTP_200_OK,
     description='Get service type by id'

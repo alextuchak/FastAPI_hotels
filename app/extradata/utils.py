@@ -11,10 +11,9 @@ import aiohttp
 
 
 class ImagePlugin:
-
     CRUDS = {HotelsCRUD.__name__: HotelsCRUD,
              ServiceTypeCRUD.__name__: ServiceTypeCRUD
-    }
+             }
 
     @classmethod
     async def check_image(cls, image):
@@ -25,7 +24,8 @@ class ImagePlugin:
                 return ValueError("wrong file type")
             final_img_sizes = {key: value for key, value in settings.IMAGES_SETTINGS['images'].items() if
                                value['width'] * value['height'] < img.size[0] * img.size[1]}
-            return True, BytesIO(content), final_img_sizes, hashlib.md5(content).hexdigest()
+            file_name = hashlib.md5(content).hexdigest() + f'.{image.filename.split(".")[1]}'
+            return True, BytesIO(content), final_img_sizes, file_name
 
     @classmethod
     async def _check_mimes_and_exts(cls, file_type):
@@ -41,20 +41,24 @@ class ImagePlugin:
         data = await cls.CRUDS[crud].get_one(image_id)
         new_media['media'] = data['media']
         url = new_media['media']['origin']
-        for size_name, sizes in sizes_dict.items():
-            buffer = BytesIO()
-            async with aiohttp.ClientSession() as session:
-                content = await session.get(url)
-                img_for_read = BytesIO(await content.read())
-                with Image.open(img_for_read) as img:
+        async with aiohttp.ClientSession() as session:
+            content = await session.get(url)
+            origin_image = BytesIO(await content.read())
+            for size_name, sizes in sizes_dict.items():
+                temp_image = BytesIO()
+                temp_image.write(origin_image.getvalue())
+                temp_image.seek(0)
+                buffer = BytesIO()
+                with Image.open(temp_image) as img:
                     img.resize((sizes['height'], sizes['width']))
-                    img.save(buffer, 'png')
+                    img.save(buffer, 'PNG')
                     buffer.seek(0)
-                    resized_img_url = await S3.upload(hashlib.md5(buffer.read()).hexdigest(), buffer)
+                    new_file_name = hashlib.md5(buffer.read()).hexdigest() + ".png"
+                    resized_img_url = await S3.upload(new_file_name, buffer)
                     buffer.close()
+                    temp_image.close()
                     new_media['media'][size_name] = resized_img_url
         await cls.CRUDS[crud].update_one(image_id, new_media)
 
 
 path = os.path.abspath('app/configs')
-
