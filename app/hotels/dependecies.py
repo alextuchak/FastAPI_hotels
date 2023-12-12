@@ -4,6 +4,10 @@ from typing import Optional
 
 class HotelsSearchArgs:
 
+    """
+    Searching args for endpoint 'hotels/find_hotels'
+    """
+
     def __init__(
             self,
             location: str,
@@ -16,3 +20,16 @@ class HotelsSearchArgs:
         self.stars = stars
         self.limit = limit
         self.offset = offset
+
+
+class ServiceTypesArgs:
+
+    """
+    Args for creating new service type
+    """
+
+    def __init__(
+            self,
+            name: str
+    ):
+        self.name = name

@@ -1,15 +1,12 @@
-from app.database import client
 from fastapi.encoders import jsonable_encoder
 from fastapi import Body
-from bson.objectid import ObjectId
 
 
 class BaseCRUD:
     """
     Base class for CRUD operation.
     """
-
-    client = client
+    client = globals().get("client")
     db = None
     collection = None
     served_model = None
@@ -45,6 +42,3 @@ class BaseCRUD:
             updated_data = await cls.get_one(id)
             return updated_data
         return False
-
-
-

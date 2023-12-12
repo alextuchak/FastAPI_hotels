@@ -59,20 +59,3 @@ PydanticObjectId = Annotated[
 ]
 
 
-async def session():
-    s = await client.start_session()
-    return s
-
-# @app.on_event("startup")
-# async def startup_event():
-#     global client
-#     global db
-#     client = motor_asyncio.AsyncIOMotorClient('mongodb://root:example@mongo:2701')
-#     db = client['hotels']
-#     print(f"Connected to {db.name()}")
-#
-#
-# @app.on_event("shutdown")
-# async def shutdown_event():
-#     global client
-#     client.close()

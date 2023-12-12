@@ -1,17 +1,10 @@
-from app.database import client
 from app.hotels.models import Hotel, ServiceTypes
-from app.base_crud import BaseCRUD as CRUD
-from fastapi.encoders import jsonable_encoder
-from fastapi import Body
+from app.base_crud import BaseCRUD
+from motor import motor_asyncio
 
 
-class BaseCRUD:
-    client = client
-    db = client['Hotels']
-    collection = db.get_collection('hotels')
-
-
-class HotelsCRUD(CRUD):
+class HotelsCRUD(BaseCRUD):
+    client = motor_asyncio.AsyncIOMotorClient("mongodb://root:example@localhost:27017")
     db = client['Hotels']
     collection = db.get_collection('hotels')
     served_model = Hotel
@@ -31,19 +24,11 @@ class HotelsCRUD(CRUD):
         return False
 
 
-
-
-
 class ServiceTypeCRUD(BaseCRUD):
+    client = motor_asyncio.AsyncIOMotorClient("mongodb://root:example@localhost:27017")
     db = client['Hotels']
     collection = db.get_collection('service_types')
-
-    @classmethod
-    async def create(cls, service_types: ServiceTypes = Body(...)) -> list[ServiceTypes]:
-        service_type = jsonable_encoder(service_types)
-        new_service = await cls.collection.insert_one(service_type)
-        created_service = await cls.collection.find_one({"_id": new_service.inserted_id})
-        return created_service
+    served_model = ServiceTypes
 
     @classmethod
     async def get(cls, service_name) -> ServiceTypes:

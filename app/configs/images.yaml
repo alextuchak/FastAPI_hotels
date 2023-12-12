@@ -1,0 +1,14 @@
+image_plugin:
+  timeout: 120000 # 2 minutes
+  images:
+    # fit=True means that thumbnails will be cropped
+    # (not only resized)
+    small:
+      width: 256
+      height: 256
+    medium:
+      width: 512
+      height: 512
+    preview:
+      width: 1280
+      height: 1280

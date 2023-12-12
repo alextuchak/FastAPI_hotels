@@ -44,12 +44,30 @@ services:
 
   reverse-proxy:
     image: traefik
-    command: --api.insecure=true --providers.docker
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
     ports:
-      # The HTTP port
       - "80:80"
       - "8080:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
-      #
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    hostname: rabbitmq
+    restart: always
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    env_file:
+      - app/.env
+    ports:
+      - 15672:15672
+      - 5672:5672
+    labels:
+      - traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.localhost`)
+    depends_on:
+      - reverse-proxy
+

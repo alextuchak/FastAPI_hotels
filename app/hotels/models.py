@@ -3,7 +3,7 @@ from app.database import PyObjectId, PyPoint
 from bson import ObjectId
 from .schemas import Serv, Location
 from fastapi import Query
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 class Hotel(BaseModel):
@@ -41,7 +41,7 @@ class Hotel(BaseModel):
 class ServiceTypes(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    logo_url: Optional[str] = Query(None)
+    media: dict
 
     class Config:
         populate_by_name = True
@@ -51,7 +51,9 @@ class ServiceTypes(BaseModel):
             "example": {
                 "_id": "6537ac8eff686ddb420d5448",
                 "name": "service",
-                "logo_url": "http://some.url.com",
+                "media": {"origin": "url",
+                          "small": "url",
+                          "medium": "url"},
             }
         }
 
